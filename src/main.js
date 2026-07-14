@@ -34,6 +34,9 @@ async function bootstrap() {
       onImpact: () => sound.play("impact"),
     });
 
+    window.__SPIDER_DEV__ = { sceneApp, webShooter };
+    loader.complete();
+
     const soundToggle = document.querySelector("#sound-toggle");
     soundToggle.addEventListener("click", async () => {
       const enabled = await sound.toggle();
@@ -57,40 +60,45 @@ async function bootstrap() {
       notify("≈", next ? "Reduced motion enabled" : "Full motion enabled");
     });
 
-    const [
-      { createMissionPanel },
-      { createQualitySelector },
-      { createPerformanceMonitor },
-      { createSpiderSense },
-      { createKeyboardControls },
-    ] = await Promise.all([
-      import("./ui/missionPanel.js"),
-      import("./ui/qualitySelector.js"),
-      import("./utils/performance.js"),
-      import("./interactions/spiderSense.js"),
-      import("./interactions/keyboardControls.js"),
-    ]);
 
-    const missionPanel = createMissionPanel({ notify, playSound: (name) => sound.play(name) });
-    const spiderSense = createSpiderSense({ sceneApp, playSound: (name) => sound.play(name) });
-    const performanceMonitor = createPerformanceMonitor({ sceneApp, webShooter, spiderSense });
-    createQualitySelector({ sceneApp, notify });
-    createKeyboardControls({
-      webShooter,
-      spiderSense,
-      cameraRig: sceneApp.cameraRig,
-      missionPanel,
-      notify,
-      onEscape: () => performanceMonitor.close(),
-    });
+    try {
+      const [
+        { createMissionPanel },
+        { createQualitySelector },
+        { createPerformanceMonitor },
+        { createSpiderSense },
+        { createKeyboardControls },
+      ] = await Promise.all([
+        import("./ui/missionPanel.js"),
+        import("./ui/qualitySelector.js"),
+        import("./utils/performance.js"),
+        import("./interactions/spiderSense.js"),
+        import("./interactions/keyboardControls.js"),
+      ]);
+
+      const missionPanel = createMissionPanel({ notify, playSound: (name) => sound.play(name) });
+      const spiderSense = createSpiderSense({ sceneApp, playSound: (name) => sound.play(name) });
+      const performanceMonitor = createPerformanceMonitor({ sceneApp, webShooter, spiderSense });
+      createQualitySelector({ sceneApp, notify });
+      createKeyboardControls({
+        webShooter,
+        spiderSense,
+        cameraRig: sceneApp.cameraRig,
+        missionPanel,
+        notify,
+        onEscape: () => performanceMonitor.close(),
+      });
+
+      window.__SPIDER_DEV__.missionPanel = missionPanel;
+      window.__SPIDER_DEV__.spiderSense = spiderSense;
+    } catch (error) {
+      console.warn("Optional UI modules failed to load:", error);
+    }
 
     document.querySelector("#enter-button").addEventListener("click", () => {
       webShooter.shootRandom();
       notify("W", "Web launched — welcome to the city");
     });
-
-    window.__SPIDER_DEV__ = { sceneApp, webShooter, spiderSense, missionPanel };
-    loader.complete();
 
     gsap.from(".hero > *", {
       y: reducedMotion ? 0 : 30,
