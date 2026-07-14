@@ -11,7 +11,10 @@ import { createSoundSystem } from "./utils/sound.js";
 function supportsWebGL() {
   try {
     const probe = document.createElement("canvas");
-    return Boolean(window.WebGLRenderingContext && (probe.getContext("webgl2") || probe.getContext("webgl")));
+    return Boolean(
+      window.WebGLRenderingContext &&
+      (probe.getContext("webgl2") || probe.getContext("webgl") || probe.getContext("experimental-webgl"))
+    );
   } catch {
     return false;
   }
