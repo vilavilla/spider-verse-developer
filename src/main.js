@@ -8,7 +8,25 @@ import { createNotifications } from "./ui/notifications.js";
 import { detectInitialQuality, prefersReducedMotion } from "./utils/responsive.js";
 import { createSoundSystem } from "./utils/sound.js";
 
+function supportsWebGL() {
+  try {
+    const probe = document.createElement("canvas");
+    return Boolean(
+      window.WebGLRenderingContext &&
+      (probe.getContext("webgl2") || probe.getContext("webgl") || probe.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
+}
+
 async function bootstrap() {
+  if (!supportsWebGL()) {
+    document.querySelector("#loader").classList.add("is-hidden");
+    document.querySelector("#webgl-fallback").hidden = false;
+    return;
+  }
+
   const canvas = document.querySelector("#city-canvas");
   const surface = document.querySelector("#experience");
   const loadingManager = new THREE.LoadingManager();
@@ -34,9 +52,6 @@ async function bootstrap() {
       onImpact: () => sound.play("impact"),
     });
 
-    window.__SPIDER_DEV__ = { sceneApp, webShooter };
-    loader.complete();
-
     const soundToggle = document.querySelector("#sound-toggle");
     soundToggle.addEventListener("click", async () => {
       const enabled = await sound.toggle();
@@ -60,45 +75,40 @@ async function bootstrap() {
       notify("≈", next ? "Reduced motion enabled" : "Full motion enabled");
     });
 
+    const [
+      { createMissionPanel },
+      { createQualitySelector },
+      { createPerformanceMonitor },
+      { createSpiderSense },
+      { createKeyboardControls },
+    ] = await Promise.all([
+      import("./ui/missionPanel.js"),
+      import("./ui/qualitySelector.js"),
+      import("./utils/performance.js"),
+      import("./interactions/spiderSense.js"),
+      import("./interactions/keyboardControls.js"),
+    ]);
 
-    try {
-      const [
-        { createMissionPanel },
-        { createQualitySelector },
-        { createPerformanceMonitor },
-        { createSpiderSense },
-        { createKeyboardControls },
-      ] = await Promise.all([
-        import("./ui/missionPanel.js"),
-        import("./ui/qualitySelector.js"),
-        import("./utils/performance.js"),
-        import("./interactions/spiderSense.js"),
-        import("./interactions/keyboardControls.js"),
-      ]);
-
-      const missionPanel = createMissionPanel({ notify, playSound: (name) => sound.play(name) });
-      const spiderSense = createSpiderSense({ sceneApp, playSound: (name) => sound.play(name) });
-      const performanceMonitor = createPerformanceMonitor({ sceneApp, webShooter, spiderSense });
-      createQualitySelector({ sceneApp, notify });
-      createKeyboardControls({
-        webShooter,
-        spiderSense,
-        cameraRig: sceneApp.cameraRig,
-        missionPanel,
-        notify,
-        onEscape: () => performanceMonitor.close(),
-      });
-
-      window.__SPIDER_DEV__.missionPanel = missionPanel;
-      window.__SPIDER_DEV__.spiderSense = spiderSense;
-    } catch (error) {
-      console.warn("Optional UI modules failed to load:", error);
-    }
+    const missionPanel = createMissionPanel({ notify, playSound: (name) => sound.play(name) });
+    const spiderSense = createSpiderSense({ sceneApp, playSound: (name) => sound.play(name) });
+    const performanceMonitor = createPerformanceMonitor({ sceneApp, webShooter, spiderSense });
+    createQualitySelector({ sceneApp, notify });
+    createKeyboardControls({
+      webShooter,
+      spiderSense,
+      cameraRig: sceneApp.cameraRig,
+      missionPanel,
+      notify,
+      onEscape: () => performanceMonitor.close(),
+    });
 
     document.querySelector("#enter-button").addEventListener("click", () => {
       webShooter.shootRandom();
       notify("W", "Web launched — welcome to the city");
     });
+
+    window.__SPIDER_DEV__ = { sceneApp, webShooter, spiderSense, missionPanel };
+    loader.complete();
 
     gsap.from(".hero > *", {
       y: reducedMotion ? 0 : 30,
@@ -110,8 +120,6 @@ async function bootstrap() {
     });
   } catch (error) {
     console.error("Spider-Verse scene failed to initialize:", error);
-    document.querySelector("#loader").classList.add("is-hidden");
-    document.querySelector("#webgl-fallback").hidden = false;
     document.querySelector("#loader-progress").textContent = "Scene initialization failed. Please refresh.";
   }
 }
