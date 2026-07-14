@@ -1,0 +1,23 @@
+{
+  "name": "spider-verse-developer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive Spider-Man-inspired Three.js developer portfolio concept.",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "npm run build && node --test tests/build.test.mjs"
+  },
+  "dependencies": {
+    "gsap": "3.13.0",
+    "three": "0.178.0"
+  },
+  "devDependencies": {
+    "vite": "7.0.6"
+  }
+}

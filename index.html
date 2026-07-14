@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#03040a" />
+    <meta name="description" content="An interactive Three.js city and web-shooting experience created for the SPIDER-MAN: Brand New Day × InfoJobs developer challenge." />
+    <meta name="codex-preview" content="development" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>Spider-Verse Developer — Interactive Three.js Experience</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#hero-title">Skip to main content</a>
+
+    <div id="webgl-fallback" class="webgl-fallback" role="alert" hidden>
+      <p><strong>WebGL is unavailable.</strong> This experience needs a browser with hardware acceleration enabled.</p>
+    </div>
+
+    <div id="loader" class="loader" role="status" aria-live="polite">
+      <div class="loader__web" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <svg viewBox="0 0 120 120" role="img" aria-label="Animated spider emblem">
+          <path d="M60 24 49 43l11 13 11-13L60 24Zm0 34-15 18 15 24 15-24L60 58Z" />
+          <path d="m49 48-22-12m20 22-29 1m30 10-23 18m66-39 22-12M73 58l29 1M72 69l23 18" />
+        </svg>
+      </div>
+      <p>CALIBRATING SPIDER-SENSE</p>
+      <div class="loader__track"><span id="loader-bar"></span></div>
+      <output id="loader-progress">0%</output>
+    </div>
+
+    <main id="experience">
+      <canvas id="city-canvas" aria-label="Interactive stylized New York skyline at night"></canvas>
+      <div class="scene-vignette" aria-hidden="true"></div>
+      <div id="sense-flash" class="sense-flash" aria-hidden="true"></div>
+      <div id="sense-waves" class="sense-waves" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+
+      <header class="hud hud--top">
+        <a class="brand" href="#top" aria-label="Spider-Verse Developer home">
+          <span class="brand__mark" aria-hidden="true">⅃⅃</span>
+          <span>SPIDER//DEV</span>
+        </a>
+        <div class="hud__actions">
+          <button id="performance-toggle" class="icon-button" type="button" aria-expanded="false" aria-controls="performance-panel">
+            <span aria-hidden="true">⌁</span><span class="performance-label">SYSTEM</span>
+          </button>
+          <button id="sound-toggle" class="icon-button" type="button" aria-pressed="false" aria-label="Enable sound">
+            <span class="sound-icon" aria-hidden="true">◖</span><span class="sound-label">SOUND OFF</span>
+          </button>
+          <button id="motion-toggle" class="icon-button" type="button" aria-pressed="false" aria-label="Reduce motion">
+            <span aria-hidden="true">≈</span><span class="motion-label">MOTION ON</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="quality-control">
+        <label for="quality-select">GRAPHICS</label>
+        <select id="quality-select" aria-label="Graphics quality">
+          <option value="performance">Performance</option>
+          <option value="balanced">Balanced</option>
+          <option value="cinematic">Cinematic</option>
+        </select>
+      </div>
+
+      <section id="top" class="hero" aria-labelledby="hero-title">
+        <p class="eyebrow"><span>01</span> INTERACTIVE FRONTEND PROTOTYPE</p>
+        <h1 id="hero-title">YOUR FRIENDLY<br /><span>NEIGHBORHOOD</span><br />DEVELOPER</h1>
+        <p class="hero__lead">Building web experiences with <em>great power</em><br />and great responsibility.</p>
+        <p class="hero__meta">Interactive concept created for the SPIDER-MAN: Brand New Day × InfoJobs developer challenge.</p>
+        <div class="hero__actions">
+          <button id="enter-button" class="button button--primary" type="button"><span>ENTER THE SPIDER-VERSE</span><b aria-hidden="true">↗</b></button>
+          <button class="button button--ghost" type="button" data-open-mission><span>VIEW THE CODE</span><b aria-hidden="true">⌁</b></button>
+        </div>
+      </section>
+
+      <div class="emblem" aria-hidden="true">
+        <svg viewBox="0 0 240 300">
+          <defs>
+            <linearGradient id="emblem-red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5b67"/><stop offset="1" stop-color="#8b0016"/></linearGradient>
+          </defs>
+          <path class="emblem__core" d="M120 38 91 85l29 32 29-32-29-47Zm0 85-38 48 38 90 38-90-38-48Z"/>
+          <g class="emblem__legs">
+            <path d="m91 95-50-37 21 57-39 32 67-18m-3 20-53 40 43-8 10 69 24-90"/>
+            <path d="m149 95 50-37-21 57 39 32-67-18m3 20 53 40-43-8-10 69-24-90"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="web-corner web-corner--left" aria-hidden="true"></div>
+      <div class="web-corner web-corner--right" aria-hidden="true"></div>
+
+      <div class="interaction-hint">
+        <span class="interaction-hint__mouse" aria-hidden="true"><i></i></span>
+        <p><strong>CLICK ANYWHERE</strong><br />TO SHOOT A WEB</p>
+      </div>
+
+      <aside class="key-guide" aria-label="Keyboard controls">
+        <span><kbd>W</kbd> WEB</span><span><kbd>S</kbd> SENSE</span><span><kbd>O</kbd> ORBIT</span><span><kbd>R</kbd> RESET</span>
+      </aside>
+
+      <button class="mission-trigger" type="button" data-open-mission><span>OPEN MISSION FILE</span><b aria-hidden="true">+</b></button>
+      <aside id="performance-panel" class="performance-panel" aria-hidden="true" aria-labelledby="performance-title">
+        <div class="performance-panel__head">
+          <p id="performance-title">LIVE SYSTEM</p><span class="live-dot">ONLINE</span>
+        </div>
+        <dl>
+          <div><dt>FPS</dt><dd id="stat-fps">—</dd></div>
+          <div><dt>ACTIVE WEBS</dt><dd id="stat-webs">0</dd></div>
+          <div><dt>SCENE OBJECTS</dt><dd id="stat-objects">—</dd></div>
+          <div><dt>SPIDER-SENSE</dt><dd id="stat-sense">STANDBY</dd></div>
+          <div><dt>QUALITY</dt><dd id="stat-quality">—</dd></div>
+        </dl>
+      </aside>
+      <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+    </main>
+
+    <div id="mission-backdrop" class="mission-backdrop" hidden></div>
+    <section id="mission" class="mission-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mission-title">
+      <div class="mission-panel__topline" aria-hidden="true"><span></span></div>
+      <header class="mission-panel__header">
+        <div>
+          <p>CONFIDENTIAL // DEVELOPER DOSSIER</p>
+          <h2 id="mission-title">MISSION FILE <span>01</span></h2>
+        </div>
+        <button class="mission-panel__close" type="button" data-close-mission aria-label="Close mission file">×</button>
+      </header>
+
+      <div class="mission-panel__scroll">
+        <div class="mission-intro section-rule">
+          <p class="section-kicker">MISSION</p>
+          <p class="mission-statement">Create an interactive, fast and memorable web experience inspired by the movement and abilities of <strong>SPIDER-MAN.</strong></p>
+          <div class="mission-status"><i></i><span>STATUS</span><strong>PROTOTYPE READY</strong></div>
+        </div>
+
+        <section class="developer-profile section-rule" aria-labelledby="developer-title">
+          <div>
+            <p class="section-kicker">ABOUT THE DEVELOPER</p>
+            <h3 id="developer-title">THE HUMAN<br />BEHIND THE MASK.</h3>
+          </div>
+          <dl class="profile-grid">
+            <div><dt>NAME</dt><dd>Sergi Adrover Torres</dd></div>
+            <div><dt>DEGREE</dt><dd>Telecommunications Systems and Services Engineering</dd></div>
+            <div><dt>CITY</dt><dd>Barcelona, Spain</dd></div>
+            <div class="profile-grid__wide"><dt>PROFILE</dt><dd>Telecommunications Engineering student specializing in Telematics, interested in combining frontend development, real-time interaction and performance.</dd></div>
+            <div><dt>GITHUB</dt><dd>[GITHUB URL]</dd></div>
+            <div><dt>LINKEDIN</dt><dd>[LINKEDIN URL]</dd></div>
+            <div><dt>EMAIL</dt><dd>[EMAIL ADDRESS]</dd></div>
+          </dl>
+        </section>
+
+        <section class="technical section-rule" aria-labelledby="technical-title">
+          <p class="section-kicker">TECHNICAL APPROACH</p>
+          <h3 id="technical-title">BUILT FROM FIRST PRINCIPLES.</h3>
+          <div class="tech-grid">
+            <article><span>01</span><b>◈</b><h4>THREE.JS SCENE</h4><p>Real-time 3D environment with fog, lighting and a restrained render loop.</p></article>
+            <article><span>02</span><b>▥</b><h4>PROCEDURAL CITY</h4><p>Seeded, instanced geometry creates a repeatable skyline without heavy assets.</p></article>
+            <article><span>03</span><b>⌖</b><h4>WEB RAYCASTING</h4><p>Pointer coordinates become world-space impacts and organic animated curves.</p></article>
+            <article><span>04</span><b>↝</b><h4>GSAP ANIMATIONS</h4><p>Camera, interface and impact feedback use focused, interruptible timelines.</p></article>
+            <article><span>05</span><b>↔</b><h4>RESPONSIVE UI</h4><p>Touch-aware controls and fluid typography adapt from mobile to wide screens.</p></article>
+            <article><span>06</span><b>⌁</b><h4>PERFORMANCE</h4><p>Quality presets, capped pixel ratio, disposal and tab pausing protect frame time.</p></article>
+            <article><span>07</span><b>◎</b><h4>ACCESSIBILITY</h4><p>Semantic structure, keyboard input, focus states and reduced motion support.</p></article>
+          </div>
+        </section>
+
+        <section class="why-me section-rule" aria-labelledby="why-title">
+          <p class="section-kicker">WHY ME?</p>
+          <h3 id="why-title">CREATIVE INSTINCT.<br />ENGINEERING DISCIPLINE.</h3>
+          <blockquote>“I enjoy combining technical problem-solving with creative interaction design. This prototype demonstrates how I approach performance, user experience and maintainable frontend development.”</blockquote>
+        </section>
+
+        <footer class="final-cta">
+          <p>MISSION COMPLETE?</p>
+          <h3>READY TO BUILD<br /><span>SOMETHING AMAZING?</span></h3>
+          <div>
+            <button class="button button--primary" type="button" data-github-link><span>VIEW GITHUB REPOSITORY</span><b aria-hidden="true">↗</b></button>
+            <button class="button button--ghost" type="button" data-placeholder-link="Email"><span>CONTACT ME</span><b aria-hidden="true">✦</b></button>
+            <button class="button button--text" type="button" data-close-mission><span>BACK TO THE CITY</span><b aria-hidden="true">↑</b></button>
+          </div>
+        </footer>
+      </div>
+    </section>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
