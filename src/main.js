@@ -8,25 +8,7 @@ import { createNotifications } from "./ui/notifications.js";
 import { detectInitialQuality, prefersReducedMotion } from "./utils/responsive.js";
 import { createSoundSystem } from "./utils/sound.js";
 
-function supportsWebGL() {
-  try {
-    const probe = document.createElement("canvas");
-    return Boolean(
-      window.WebGLRenderingContext &&
-      (probe.getContext("webgl2") || probe.getContext("webgl") || probe.getContext("experimental-webgl"))
-    );
-  } catch {
-    return false;
-  }
-}
-
 async function bootstrap() {
-  if (!supportsWebGL()) {
-    document.querySelector("#loader").classList.add("is-hidden");
-    document.querySelector("#webgl-fallback").hidden = false;
-    return;
-  }
-
   const canvas = document.querySelector("#city-canvas");
   const surface = document.querySelector("#experience");
   const loadingManager = new THREE.LoadingManager();
@@ -120,6 +102,8 @@ async function bootstrap() {
     });
   } catch (error) {
     console.error("Spider-Verse scene failed to initialize:", error);
+    document.querySelector("#loader").classList.add("is-hidden");
+    document.querySelector("#webgl-fallback").hidden = false;
     document.querySelector("#loader-progress").textContent = "Scene initialization failed. Please refresh.";
   }
 }
