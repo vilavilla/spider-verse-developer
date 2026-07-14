@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Interactive Spider-Man-inspired Three.js developer portfolio concept.",
+  "description": "Interactive personal portfolio built with Three.js and Vite.",
   "engines": {
     "node": ">=20.19.0"
   },
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "gsap": "3.13.0",
+    "spider-verse-developer": "file:",
     "three": "0.178.0"
   },
   "devDependencies": {

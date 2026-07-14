@@ -5,8 +5,8 @@ export function createMissionPanel({ notify, playSound }) {
   const backdrop = document.querySelector("#mission-backdrop");
   const openButtons = [...document.querySelectorAll("[data-open-mission]")];
   const closeButtons = [...document.querySelectorAll("[data-close-mission]")];
-  const placeholderButtons = [...document.querySelectorAll("[data-placeholder-link]")];
   const githubButton = panel.querySelector("[data-github-link]");
+  const emailButton = panel.querySelector("[data-email-link]");
   let lastFocused;
   let openState = false;
 
@@ -45,9 +45,6 @@ export function createMissionPanel({ notify, playSound }) {
   openButtons.forEach((button) => button.addEventListener("click", open));
   closeButtons.forEach((button) => button.addEventListener("click", close));
   backdrop.addEventListener("click", close);
-  placeholderButtons.forEach((button) => button.addEventListener("click", () => {
-    notify("EDIT", `Replace the ${button.dataset.placeholderLink} placeholder before publishing`);
-  }));
   githubButton?.addEventListener("click", () => {
     if (window.location.hostname.endsWith("github.io")) {
       const owner = window.location.hostname.split(".")[0];
@@ -58,7 +55,10 @@ export function createMissionPanel({ notify, playSound }) {
       window.open(repositoryUrl, "_blank", "noopener,noreferrer");
       return;
     }
-    notify("GIT", "The repository link activates automatically on GitHub Pages");
+    window.open("https://github.com/vilavilla/spider-verse-developer", "_blank", "noopener,noreferrer");
+  });
+  emailButton?.addEventListener("click", () => {
+    window.location.href = emailButton.dataset.emailLink;
   });
 
   panel.addEventListener("keydown", (event) => {
